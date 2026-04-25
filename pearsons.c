@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <omp.h>
 
 #include "types.h"
 
@@ -72,6 +73,7 @@ void calc_similarity_optimized(RatingEntry *normalizeduser, int normalizeduser_s
 		}
 	}
 
+	# pragma omp parallel for private(j) schedule(dynamic)
 	for (i = 0; i < store->no_of_users; i++)
 	{
 		UserRatings *user = &store->users[i];
@@ -102,7 +104,7 @@ void calc_similarity_optimized(RatingEntry *normalizeduser, int normalizeduser_s
 				cnt++;
 			}
 		}
-		double denom = sqrt(mag_a) * sqrt(mag_b);
+		double denom = sqrt(mag_a * mag_b);
 		similarity[i] = (cnt > 1 && denom > 1e-12)? (dot / denom) : 0.0;
 	}
 

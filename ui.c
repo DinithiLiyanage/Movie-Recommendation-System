@@ -226,7 +226,7 @@ void main()
             {
                 ratemovie(uid);
                 printf("Rate more(Type '0') or recommend(Type '1'): ");
-                scanf("%d", &choice);
+                // scanf("%d", &choice);
             }
             recommender(uid);
             break;

@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "utility_matrix.h"
-
 void get_movie_names(char *movienames, char *s)
 {
 	char *line, *record;
@@ -32,6 +30,8 @@ void get_movie_names(char *movienames, char *s)
 		j = 0;
 	}
 	fclose(fstream);
+	// free(line);
+	// free(record);
 }
 
 void get_movie_genres(char *moviegenres, char *s)

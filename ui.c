@@ -116,10 +116,8 @@ void getmovies(int uid)
         j = 0;
     }
     fclose(fstream);
-    free(movienames);
-    free(moviegenres);
-    // free(line);
-    // free(record);
+	free(movienames);
+	free(moviegenres);
 }
 
 void main()

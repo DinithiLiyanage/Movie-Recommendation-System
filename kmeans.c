@@ -13,10 +13,10 @@
 #define BIG_double (INFINITY)
 
 void fail(char *str)
-{
-  fputs(str, stderr);
-  exit(-1);
-}
+  {
+    fputs(str, stderr);
+    exit(-1);
+  }
 
 double calc_distance(int dim, double *p1, double *p2)
 {

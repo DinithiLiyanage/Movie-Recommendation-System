@@ -1,7 +1,7 @@
 // Contains all logic and function calls
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h>
+// #include <conio.h>
 #include <time.h>
 #include <string.h>
 
@@ -163,7 +163,7 @@ void recommender(int uid)
 			if (choice == 0)
 				break;
 			else if (choice == 1)
-				printf("");
+				continue;
 			else
 			{
 				printf("\nInvalid choice.\n\n");

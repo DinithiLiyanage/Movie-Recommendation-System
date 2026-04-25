@@ -14,7 +14,7 @@
 
 void fail(char *str)
   {
-    printf(str);
+    fputs(str, stderr);
     exit(-1);
   }
 

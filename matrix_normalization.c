@@ -3,6 +3,8 @@
 #include<stdlib.h>
 #include<string.h>
 
+#include "types.h"
+
 double calc_average(double *utility_matrix,int No_of_movies){ //inputs: utility matrix and user id
 	double average, sum=0;
 	int i=0, count=0;
@@ -13,6 +15,9 @@ double calc_average(double *utility_matrix,int No_of_movies){ //inputs: utility 
 			count++; //increase count
 			sum += utility_matrix[i]; //add to total sum
 		}
+	}
+	if(count==0){
+		return 0;
 	}
 	return average = sum/count;
 }
@@ -45,7 +50,9 @@ void normalize(double *user, double *normalizeduser, int No_of_movies){ //inputs
 			count++;
 		}
 	}
-	average = sum/count;
+	if(count!=0){
+		average = sum/count;
+	}
 	
 	//normalizing the vector
 	for(i=0;i<No_of_movies;i++){
@@ -53,6 +60,42 @@ void normalize(double *user, double *normalizeduser, int No_of_movies){ //inputs
 			normalizeduser[i] = 0; //rating becomes zero if not rated
 		}else{
 			normalizeduser[i] = user[i] - average; //subtract average rating from current rating
+		}
+	}
+}
+
+void normalize_ratings_optimized(RatingsStore *store)
+{
+	int i, j;
+
+	if (store == NULL || store->users == NULL)
+	{
+		return;
+	}
+
+	for (i = 0; i < store->no_of_users; i++)
+	{
+		UserRatings *user = &store->users[i];
+		double sum = 0.0;
+		double mean = 0.0;
+
+		if (user->size <= 0 || user->entries == NULL)
+		{
+			user->mean = 0.0;
+			continue;
+		}
+
+		for (j = 0; j < user->size; j++)
+		{
+			sum += user->entries[j].rating;
+		}
+
+		mean = sum / user->size;
+		user->mean = mean;
+
+		for (j = 0; j < user->size; j++)
+		{
+			user->entries[j].rating -= mean;
 		}
 	}
 }

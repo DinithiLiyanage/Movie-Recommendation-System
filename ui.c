@@ -1,97 +1,152 @@
-//Contains code for command line user interface
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
-#include<ctype.h>
+// Contains code for command line user interface
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <time.h>
 
 #include "recommender.h"
 #include "utility_matrix.h"
 
 #define No_of_movies 9125
 
-void ratemovie(int uid){
-	int movieid;
-	double rating;
-	FILE *fstream = fopen("Dataset/ratings_learn.csv","a");
-	printf("Enter movieid: ");
-	if(1 != scanf("%d",&movieid)){
+static const char *RATINGS_LEARN_PATH = "Dataset/ratings_learn.csv";
+static const char *MOVIES_PATH = "Dataset/movies.csv";
+static const char *MOVIES_GENRES_PATH = "Dataset/movies_genres.csv";
+
+void ratemovie(int uid)
+{
+    int movieid;
+    double rating;
+    FILE *fstream = fopen(RATINGS_LEARN_PATH, "a");
+    printf("Enter movieid: ");
+    if (1 != scanf("%d", &movieid))
+    {
         printf("\nCharacter inputs are not accepted.\n");
         return;
     }
-    if(movieid < 1 || movieid > 9125){
-		printf("Non existent movie id.");
-		return;
-	}
-	printf("Enter rating: ");
-	if(1 != scanf("%lf",&rating)){
+    if (movieid < 1 || movieid > 9125)
+    {
+        printf("Non existent movie id.");
+        return;
+    }
+    printf("Enter rating: ");
+    if (1 != scanf("%lf", &rating))
+    {
         printf("\nCharacter inputs are not accepted.\n");
         return;
     }
-    if(rating < 1.0 || rating > 5.0){
-		printf("Invalid rating.\n");
-		return;
-	}
-	fprintf(fstream,"\n%d,%d,%.1f",uid,movieid,rating);
-	fclose(fstream);
+    if (rating < 1.0 || rating > 5.0)
+    {
+        printf("Invalid rating.\n");
+        return;
+    }
+    fprintf(fstream, "\n%d,%d,%.1f", uid, movieid, rating);
+    fclose(fstream);
 }
 
-int assignuid(){
+int assignuid()
+{
     char *line, *record;
     char tmp[1024];
-    FILE *fstream = fopen("Dataset/ratings_learn.csv","r");
-    int j=0;
+    FILE *fstream = fopen(RATINGS_LEARN_PATH, "r");
+    int j = 0;
     int max = 0;
-    while((line=fgets(tmp,sizeof(tmp),fstream))!=NULL){
-    record = strtok(line,",");
-    while(record!=NULL){
-        if(j==0){
-            int t = atoi(record);
-        if(t > max) max = t;
+    while ((line = fgets(tmp, sizeof(tmp), fstream)) != NULL)
+    {
+        record = strtok(line, ",");
+        while (record != NULL)
+        {
+            if (j == 0)
+            {
+                int t = atoi(record);
+                if (t > max)
+                    max = t;
+            }
+            j++;
+            record = strtok(NULL, ","); // iterate
         }
-        j++;
-            record = strtok(NULL,","); //iterate
-    }
-    j=0;
+        j = 0;
     }
     fclose(fstream);
-    return max+1;
+    // free(line);
+    // free(record);
+    return max + 1;
 }
-void getmovies(int uid){
+void getmovies(int uid)
+{
     char *line, *record;
     char tmp[1024];
-    FILE *fstream = fopen("Dataset/ratings_learn.csv","r");
+    FILE *fstream = fopen(RATINGS_LEARN_PATH, "r");
+    if (fstream == NULL)
+    {
+        perror("Failed to open ratings dataset");
+        return;
+    }
     char *movienames = (char *)malloc(sizeof(char) * No_of_movies * 1024);
-	char *moviegenres = (char *)malloc(sizeof(char) * No_of_movies * 1024);
-	get_movie_names(movienames,"Dataset/movies.csv");
-	get_movie_genres(moviegenres,"Dataset/movies_genres.csv");
-    int j=0,userid,movieid;
+    char *moviegenres = (char *)malloc(sizeof(char) * No_of_movies * 1024);
+    get_movie_names(movienames, (char *)MOVIES_PATH);
+    get_movie_genres(moviegenres, (char *)MOVIES_GENRES_PATH);
+    int j = 0, userid, movieid;
     double rating;
-    while((line=fgets(tmp,sizeof(tmp),fstream))!=NULL){
-		record = strtok(line,",");
-		while(record!=NULL){
-			if(j==0){
-				userid = atoi(record);
-			}
-			else if(j==1){
-				movieid = atoi(record) - 1;
-			}
-			else {
-				if(userid==uid){
-					rating = atof(record);
-					printf("%.1f - %s %s",rating,&movienames[movieid*1024],&moviegenres[movieid*1024]);
-				}
-			}
-			j++;
-			record = strtok(NULL,",");
-		}
-		j=0;
+    while ((line = fgets(tmp, sizeof(tmp), fstream)) != NULL)
+    {
+        record = strtok(line, ",");
+        while (record != NULL)
+        {
+            if (j == 0)
+            {
+                userid = atoi(record);
+            }
+            else if (j == 1)
+            {
+                movieid = atoi(record) - 1;
+            }
+            else
+            {
+                if (userid == uid)
+                {
+                    rating = atof(record);
+                    printf("%.1f - %s %s", rating, &movienames[movieid * 1024], &moviegenres[movieid * 1024]);
+                }
+            }
+            j++;
+            record = strtok(NULL, ",");
+        }
+        j = 0;
     }
     fclose(fstream);
 	free(movienames);
 	free(moviegenres);
 }
 
-void main(){
+void main()
+{
+#ifdef BENCHMARK_MODE
+    int users[] = {1, 242, 363, 472, 548};
+    int num_users = 5;
+
+    // Get total time taken for the whole process
+    clock_t start = clock();
+
+    for (int i = 0; i < num_users; i++)
+    {
+        printf("Running recommender for user %d...\n", users[i]);
+
+        // Optional: show existing data
+        getmovies(users[i]);
+        for (int j = 0; j < 50; j++)
+        {
+            recommender(users[i]);
+        }
+    }
+
+    clock_t end = clock();
+    double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC;
+    printf("Total time taken: %f seconds\n", time_taken);
+    printf("Average time taken per user for optimized version: %f seconds\n", time_taken / (num_users * 50));
+
+#else
     int repeat = 1;
     int ans = 0;
     int uid = 548;
@@ -187,4 +242,6 @@ void main(){
             printf("Enter valid input.\n");
         }
     }
+
+#endif
 }

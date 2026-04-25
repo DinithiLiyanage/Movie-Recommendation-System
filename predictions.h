@@ -29,5 +29,15 @@ void test_predictions(
 					  double *predicted_ratings,
 					  int No_of_movies
 					  );
+
+int make_prediction_optimized(
+	RatingEntry *user,
+	int user_size,
+	int *similar_users,
+	int no_of_susers,
+	double *similarity,
+	RatingsStore *store,
+	int *recommended_movies,
+	double *predicted_ratings);
 					
 #endif

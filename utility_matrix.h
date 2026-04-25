@@ -1,37 +1,45 @@
-//header for utility_matrix.h
+// header for utility_matrix.h
 #ifndef UTILITY_MATRIX_H
 #define UTILITY_MATRIX_H
 
-void get_movie_names(
-					char *movienames, // defined as char *movienames = (char *)malloc(sizeof(char)* No_of_movies * 1024)); where movies will be stored
+#include "types.h"
 
-					char *s // source of dataset file
-					);
+void get_movie_names(
+	char *movienames, // defined as char *movienames = (char *)malloc(sizeof(char)* No_of_movies * 1024)); where movies will be stored
+
+	char *s // source of dataset file
+);
 
 void get_movie_genres(
-					char *moviegenres, // defined as char *moviegenres = (char *)malloc(sizeof(char) * No_of_movies * 1024); where movie genres will be stored
+	char *moviegenres, // defined as char *moviegenres = (char *)malloc(sizeof(char) * No_of_movies * 1024); where movie genres will be stored
 
-					char *s // source of dataset file
-					);
+	char *s // source of dataset file
+);
 
 void get_utility_matrix(
-						double *utility_matrix, // defined as double *utility_matrix = (double *)malloc(sizeof(double) * No_of_users * No_of_movies); where matrix will be stored
+	double *utility_matrix, // defined as double *utility_matrix = (double *)malloc(sizeof(double) * No_of_users * No_of_movies); where matrix will be stored
 
-						char *s, // source of dataset file
+	char *s, // source of dataset file
 
-						int No_of_movies,
+	int No_of_movies,
 
-						int No_of_users,
+	int No_of_users,
 
-						int uid
-						);
+	int uid);
 
 void new_user_movies(
-                     double *newuser, //defined as double *newuser = (double *)malloc(sizeof(double) * No_of_movies); where ratings of new user will be stored
+	double *newuser, // defined as double *newuser = (double *)malloc(sizeof(double) * No_of_movies); where ratings of new user will be stored
 
-                     char *s, //source of new users' dataset file
+	char *s, // source of new users' dataset file
 
-                     int uid
-                     );
+	int uid);
+
+RatingsStore *load_ratings_optimized(
+	char *s, // source of dataset file
+	int No_of_movies,
+	int No_of_users);
+
+void free_ratings_optimized(
+	RatingsStore *store);
 
 #endif
